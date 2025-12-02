@@ -1,0 +1,24 @@
+# .air.toml
+
+# output binary
+bin = "tmp/app"
+
+# build command
+cmd = "go build -o tmp/app ."
+
+# auto reload when these folders change
+include_dir = ["."]
+exclude_dir = [
+  "tmp",
+  "vendor",
+  "frontend",
+  "deploy",
+  "node_modules"
+]
+
+# file extensions that trigger reload
+include_ext = ["go", "env", "tmpl", "html"]
+exclude_ext = ["swp", "tmp"]
+
+[run]
+cmd = "./tmp/app"
