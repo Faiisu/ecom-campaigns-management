@@ -72,3 +72,30 @@ func AddProduct(c *fiber.Ctx) error {
 
 	return c.JSON(fiber.Map{"status": "product added"})
 }
+
+// GetProducts godoc
+// @Summary Get all products
+// @Description Retrieve a list of all products
+// @Tags Products
+// @Accept json
+// @Produce json
+// @Success 200 {array} models.Product
+// @Failure 500 {object} ErrorResponse
+// @Router /products [get]
+func GetProducts(c *fiber.Ctx) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	var products []models.Product
+	cursor, err := db.ProductCollection.Find(ctx, bson.M{})
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(ErrorResponse{Error: "Failed to fetch products"})
+	}
+	defer cursor.Close(ctx)
+
+	if err = cursor.All(ctx, &products); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(ErrorResponse{Error: "Failed to decode products"})
+	}
+
+	return c.JSON(products)
+}

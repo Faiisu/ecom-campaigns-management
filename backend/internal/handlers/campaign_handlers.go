@@ -9,20 +9,38 @@ import (
 	"github.com/faiisu/ecom-backend/internal/models"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
+	"go.mongodb.org/mongo-driver/bson"
 )
+
+type RegisterCampaign struct {
+	Name                  string    `json:"name"`
+	Description           string    `json:"description"`
+	DiscountType          string    `json:"discount_type"`
+	DiscountValue         float64   `json:"discount_value"`
+	CampaignCategoryID    string    `json:"campaign_category_id"`
+	IsActive              bool      `json:"is_active"`
+	StartAt               time.Time `json:"start_at"`
+	EndAt                 time.Time `json:"end_at"`
+	ListProductCategoryID []string  `json:"list_product_category_id"`
+}
+
+type RegisterCampaignCategory struct {
+	Name        string `json:"name"`
+	Description string `json:"description"`
+}
 
 // AddCampaign godoc
 // @Summary Create a new campaign
 // @Tags Campaigns
 // @Accept json
 // @Produce json
-// @Param campaign body models.Campaign true "Campaign payload"
-// @Success 201 {object} models.Campaign
+// @Param campaign body RegisterCampaign true "Campaign payload"
+// @Success 201 {object} RegisterCampaign
 // @Failure 400 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /campaigns [post]
 func AddCampaign(c *fiber.Ctx) error {
-	var req models.Campaign
+	var req RegisterCampaign
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(ErrorResponse{Error: "Invalid request"})
 	}
@@ -30,12 +48,187 @@ func AddCampaign(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(ErrorResponse{Error: "Missing required fields"})
 	}
 
-	req.ID = uuid.New().String()
+	campaign := models.Campaign{
+		ID:                 uuid.New().String(),
+		Name:               req.Name,
+		Description:        req.Description,
+		DiscountType:       req.DiscountType,
+		DiscountValue:      req.DiscountValue,
+		CampaignCategoryID: req.CampaignCategoryID,
+		IsActive:           req.IsActive,
+		StartAt:            req.StartAt,
+		EndAt:              req.EndAt,
+	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	if _, err := db.CampaignCollection.InsertOne(ctx, req); err != nil {
+	if _, err := db.CampaignCollection.InsertOne(ctx, campaign); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(ErrorResponse{Error: "Failed to create campaign"})
 	}
+
+	// Create CampaignTargetCategory records
+	if len(req.ListProductCategoryID) > 0 {
+		var targetCategories []interface{}
+		for _, catID := range req.ListProductCategoryID {
+			targetCategories = append(targetCategories, models.CampaignTargetCategory{
+				CampaignID:        campaign.ID,
+				ProductCategoryID: catID,
+			})
+		}
+
+		if _, err := db.CampaignTargetCategoryCollection.InsertMany(ctx, targetCategories); err != nil {
+			// Note: In a production app, we might want to rollback the campaign creation here
+			// or use a transaction. For now, we'll just log/return error.
+			return c.Status(fiber.StatusInternalServerError).JSON(ErrorResponse{Error: "Failed to create campaign target categories"})
+		}
+	}
+
+	return c.Status(fiber.StatusCreated).JSON(campaign)
+}
+
+// GetCampaigns godoc
+// @Summary Get all campaigns
+// @Tags Campaigns
+// @Accept json
+// @Produce json
+// @Success 200 {array} models.Campaign
+// @Failure 500 {object} ErrorResponse
+// @Router /campaigns [get]
+func GetCampaigns(c *fiber.Ctx) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	var campaigns []models.Campaign
+	cursor, err := db.CampaignCollection.Find(ctx, fiber.Map{})
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(ErrorResponse{Error: "Failed to fetch campaigns"})
+	}
+	defer cursor.Close(ctx)
+
+	if err = cursor.All(ctx, &campaigns); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(ErrorResponse{Error: "Failed to decode campaigns"})
+	}
+
+	return c.JSON(campaigns)
+}
+
+// DeleteCampaign godoc
+// @Summary Soft delete a campaign
+// @Description Soft delete a campaign by ID (set is_active to false)
+// @Tags Campaigns
+// @Accept json
+// @Produce json
+// @Param id path string true "Campaign ID"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} ErrorResponse
+// @Failure 500 {object} ErrorResponse
+// @Router /campaigns/{id} [delete]
+func DeleteCampaign(c *fiber.Ctx) error {
+	id := c.Params("id")
+	if id == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(ErrorResponse{Error: "Campaign ID is required"})
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	update := bson.M{"$set": bson.M{"is_active": false}}
+	result, err := db.CampaignCollection.UpdateOne(ctx, bson.M{"_id": id}, update)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(ErrorResponse{Error: "Failed to delete campaign"})
+	}
+
+	if result.MatchedCount == 0 {
+		return c.Status(fiber.StatusNotFound).JSON(ErrorResponse{Error: "Campaign not found"})
+	}
+
+	return c.JSON(fiber.Map{"status": "Campaign deleted successfully"})
+}
+
+// ActivateCampaign godoc
+// @Summary Activate a campaign
+// @Description Activate a campaign by ID (set is_active to true)
+// @Tags Campaigns
+// @Accept json
+// @Produce json
+// @Param id path string true "Campaign ID"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} ErrorResponse
+// @Failure 500 {object} ErrorResponse
+// @Router /campaigns/{id}/activate [patch]
+func ActivateCampaign(c *fiber.Ctx) error {
+	id := c.Params("id")
+	if id == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(ErrorResponse{Error: "Campaign ID is required"})
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	update := bson.M{"$set": bson.M{"is_active": true}}
+	result, err := db.CampaignCollection.UpdateOne(ctx, bson.M{"_id": id}, update)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(ErrorResponse{Error: "Failed to activate campaign"})
+	}
+
+	if result.MatchedCount == 0 {
+		return c.Status(fiber.StatusNotFound).JSON(ErrorResponse{Error: "Campaign not found"})
+	}
+
+	return c.JSON(fiber.Map{"status": "Campaign activated successfully"})
+}
+
+// AddCampaignCategory godoc
+// @Summary Create a new campaign category
+// @Tags Campaigns
+// @Accept json
+// @Produce json
+// @Param category body RegisterCampaignCategory true "Category payload"
+// @Success 201 {object} RegisterCampaignCategory
+// @Failure 400 {object} ErrorResponse
+// @Failure 500 {object} ErrorResponse
+// @Router /campaign-categories [post]
+func AddCampaignCategory(c *fiber.Ctx) error {
+	var req RegisterCampaignCategory
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(ErrorResponse{Error: "Invalid request"})
+	}
+	if req.Name == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(ErrorResponse{Error: "Name is required"})
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if _, err := db.CampaignCategoryCollection.InsertOne(ctx, req); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(ErrorResponse{Error: "Failed to create campaign category"})
+	}
 	return c.Status(fiber.StatusCreated).JSON(req)
+}
+
+// GetCampaignCategories godoc
+// @Summary Get all campaign categories
+// @Tags Campaigns
+// @Accept json
+// @Produce json
+// @Success 200 {array} models.CampaignsCategories
+// @Failure 500 {object} ErrorResponse
+// @Router /campaign-categories [get]
+func GetCampaignCategories(c *fiber.Ctx) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	var categories []models.CampaignsCategories
+	cursor, err := db.CampaignCategoryCollection.Find(ctx, fiber.Map{})
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(ErrorResponse{Error: "Failed to fetch categories"})
+	}
+	defer cursor.Close(ctx)
+
+	if err = cursor.All(ctx, &categories); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(ErrorResponse{Error: "Failed to decode categories"})
+	}
+
+	return c.JSON(categories)
 }

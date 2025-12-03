@@ -11,11 +11,13 @@ import (
 )
 
 var (
-	MongoClient        *mongo.Client
-	UserCollection     *mongo.Collection
-	ProductCollection  *mongo.Collection
-	CategoryCollection *mongo.Collection
-	CampaignCollection *mongo.Collection
+	MongoClient                      *mongo.Client
+	UserCollection                   *mongo.Collection
+	ProductCollection                *mongo.Collection
+	CategoryCollection               *mongo.Collection
+	CampaignCollection               *mongo.Collection
+	CampaignCategoryCollection       *mongo.Collection
+	CampaignTargetCategoryCollection *mongo.Collection
 )
 
 func ConnectMongo(mongoURL, dbName string) error {
@@ -50,6 +52,9 @@ func ConnectMongo(mongoURL, dbName string) error {
 	ProductCollection = db.Collection("Products")
 	CampaignCollection = db.Collection("Campaigns")
 	CategoryCollection = db.Collection("ProductCategories")
+	CategoryCollection = db.Collection("ProductCategories")
+	CampaignCategoryCollection = db.Collection("CampaignCategories")
+	CampaignTargetCategoryCollection = db.Collection("CampaignTargetCategories")
 
 	return nil
 }

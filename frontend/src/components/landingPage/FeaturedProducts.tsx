@@ -1,37 +1,64 @@
 import React from 'react';
 
-const products = [
-    {
-        id: 1,
-        name: 'Wireless Noise-Canceling Headphones',
-        price: '$299.99',
-        image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-        category: 'Electronics'
-    },
-    {
-        id: 2,
-        name: 'Premium Smart Watch',
-        price: '$199.99',
-        image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-        category: 'Accessories'
-    },
-    {
-        id: 3,
-        name: 'Ergonomic Office Chair',
-        price: '$349.99',
-        image: 'https://images.unsplash.com/photo-1505843490538-5133c6c7d0e1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-        category: 'Furniture'
-    },
-    {
-        id: 4,
-        name: 'Mechanical Keyboard',
-        price: '$129.99',
-        image: 'https://images.unsplash.com/photo-1587829741301-dc798b91add1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-        category: 'Electronics'
-    }
-];
+interface Product {
+    id: number;
+    name: string;
+    price: string;
+    image: string;
+    category: string;
+}
 
 const FeaturedProducts: React.FC = () => {
+    const [products, setProducts] = React.useState<Product[]>([]);
+    const [isLoading, setIsLoading] = React.useState(true);
+    const [error, setError] = React.useState<string | null>(null);
+
+    React.useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                const backendUrl = import.meta.env.VITE_BACKEND_URL || '';
+                const response = await fetch(`${backendUrl}/products`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch products');
+                }
+                const data = await response.json();
+                setProducts(data);
+            } catch (err) {
+                console.error('Error fetching products:', err);
+                setError('Failed to load products');
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchProducts();
+    }, []);
+
+    if (isLoading) {
+        return (
+            <section className="py-16 bg-white">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="text-center mb-12">
+                        <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl">Featured Products</h2>
+                        <div className="mt-8 flex justify-center">
+                            <div className="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        );
+    }
+
+    if (error) {
+        return (
+            <section className="py-16 bg-white">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                    <p className="text-red-500">{error}</p>
+                </div>
+            </section>
+        );
+    }
+
     return (
         <section className="py-16 bg-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

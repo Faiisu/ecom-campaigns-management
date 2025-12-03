@@ -12,6 +12,36 @@ definitions:
       user:
         $ref: '#/definitions/handlers.RegisterUserPayload'
     type: object
+  handlers.RegisterCampaign:
+    properties:
+      campaign_category_id:
+        type: string
+      description:
+        type: string
+      discount_type:
+        type: string
+      discount_value:
+        type: number
+      end_at:
+        type: string
+      is_active:
+        type: boolean
+      list_product_category_id:
+        items:
+          type: string
+        type: array
+      name:
+        type: string
+      start_at:
+        type: string
+    type: object
+  handlers.RegisterCampaignCategory:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+    type: object
   handlers.RegisterProduct:
     properties:
       description:
@@ -59,6 +89,8 @@ definitions:
     type: object
   models.Campaign:
     properties:
+      campaign_category_id:
+        type: string
       description:
         type: string
       discount_type:
@@ -66,10 +98,23 @@ definitions:
         type: string
       discount_value:
         type: number
+      end_at:
+        type: string
       id:
         type: string
       is_active:
         type: boolean
+      name:
+        type: string
+      start_at:
+        type: string
+    type: object
+  models.CampaignsCategories:
+    properties:
+      description:
+        type: string
+      id:
+        type: string
       name:
         type: string
     type: object
@@ -138,7 +183,74 @@ paths:
       summary: Login a user
       tags:
       - Auth
+  /campaign-categories:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.CampaignsCategories'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Get all campaign categories
+      tags:
+      - Campaigns
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Category payload
+        in: body
+        name: category
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.RegisterCampaignCategory'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/handlers.RegisterCampaignCategory'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Create a new campaign category
+      tags:
+      - Campaigns
   /campaigns:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Campaign'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Get all campaigns
+      tags:
+      - Campaigns
     post:
       consumes:
       - application/json
@@ -148,14 +260,14 @@ paths:
         name: campaign
         required: true
         schema:
-          $ref: '#/definitions/models.Campaign'
+          $ref: '#/definitions/handlers.RegisterCampaign'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/models.Campaign'
+            $ref: '#/definitions/handlers.RegisterCampaign'
         "400":
           description: Bad Request
           schema:
@@ -167,7 +279,89 @@ paths:
       summary: Create a new campaign
       tags:
       - Campaigns
+  /campaigns/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Soft delete a campaign by ID (set is_active to false)
+      parameters:
+      - description: Campaign ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Soft delete a campaign
+      tags:
+      - Campaigns
+  /campaigns/{id}/activate:
+    patch:
+      consumes:
+      - application/json
+      description: Activate a campaign by ID (set is_active to true)
+      parameters:
+      - description: Campaign ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Activate a campaign
+      tags:
+      - Campaigns
   /product-categories:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of all product categories
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.ProductCategory'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Get all product categories
+      tags:
+      - Products
     post:
       consumes:
       - application/json
@@ -196,7 +390,58 @@ paths:
       summary: Create a new product category
       tags:
       - Products
+  /product-categories/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a product category by ID
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Delete a product category
+      tags:
+      - Products
   /products:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of all products
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Product'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Get all products
+      tags:
+      - Products
     post:
       consumes:
       - application/json

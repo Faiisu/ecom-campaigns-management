@@ -10,7 +10,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -30,15 +29,6 @@ type loginRequest struct {
 type LoginResponse struct {
 	Message string              `json:"Message"`
 	User    RegisterUserPayload `json:"user"`
-}
-
-type userDocument struct {
-	ID           primitive.ObjectID `bson:"_id,omitempty"`
-	Email        string             `bson:"email"`
-	PasswordHash string             `bson:"password_hash"`
-	FirstName    string             `bson:"first_name"`
-	LastName     string             `bson:"last_name"`
-	CreatedAt    time.Time          `bson:"created_at"`
 }
 
 type RegisterUserPayload struct {

@@ -1,10 +1,28 @@
-import React from 'react';
+import React, { useState } from 'react';
 import FeaturedProducts from '../components/landingPage/FeaturedProducts';
+import CreateProduct from './CreateProduct';
+import { FaPlus } from 'react-icons/fa';
 
 const LandingPage: React.FC = () => {
+    const [isCreateProductOpen, setIsCreateProductOpen] = useState(false);
+
     return (
-        <div className="min-h-screen flex flex-col">
+        <div className="min-h-screen flex flex-col relative">
             <FeaturedProducts />
+
+            {/* Floating Action Button for Create Product */}
+            <button
+                onClick={() => setIsCreateProductOpen(true)}
+                className="fixed bottom-8 right-8 bg-indigo-600 text-white p-4 rounded-full shadow-lg hover:bg-indigo-700 transition-all transform hover:scale-110 z-40 flex items-center justify-center group"
+                title="Create New Product"
+            >
+                <FaPlus className="text-xl" />
+                <span className="max-w-0 overflow-hidden group-hover:max-w-xs group-hover:ml-2 transition-all duration-300 ease-in-out whitespace-nowrap">
+                    Add Product
+                </span>
+            </button>
+
+            <CreateProduct isOpen={isCreateProductOpen} onClose={() => setIsCreateProductOpen(false)} />
         </div>
     );
 };
