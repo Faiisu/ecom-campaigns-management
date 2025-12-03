@@ -106,6 +106,10 @@ definitions:
         type: boolean
       name:
         type: string
+      product_categories:
+        items:
+          $ref: '#/definitions/models.ProductCategory'
+        type: array
       start_at:
         type: string
     type: object
@@ -133,6 +137,8 @@ definitions:
       price:
         type: number
       product_category_id:
+        type: string
+      product_category_name:
         type: string
     type: object
   models.ProductCategory:

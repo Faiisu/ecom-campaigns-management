@@ -10,6 +10,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type RegisterCampaign struct {
@@ -100,7 +101,23 @@ func GetCampaigns(c *fiber.Ctx) error {
 	defer cancel()
 
 	var campaigns []models.Campaign
-	cursor, err := db.CampaignCollection.Find(ctx, fiber.Map{})
+
+	pipeline := mongo.Pipeline{
+		{{Key: "$lookup", Value: bson.M{
+			"from":         "CampaignTargetCategories",
+			"localField":   "_id",
+			"foreignField": "campaign_id",
+			"as":           "target_categories",
+		}}},
+		{{Key: "$lookup", Value: bson.M{
+			"from":         "ProductCategories",
+			"localField":   "target_categories.product_category_id",
+			"foreignField": "_id",
+			"as":           "product_categories",
+		}}},
+	}
+
+	cursor, err := db.CampaignCollection.Aggregate(ctx, pipeline)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(ErrorResponse{Error: "Failed to fetch campaigns"})
 	}
@@ -108,6 +125,13 @@ func GetCampaigns(c *fiber.Ctx) error {
 
 	if err = cursor.All(ctx, &campaigns); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(ErrorResponse{Error: "Failed to decode campaigns"})
+	}
+
+	// Ensure ProductCategories is an empty list if nil
+	for i := range campaigns {
+		if campaigns[i].ProductCategories == nil {
+			campaigns[i].ProductCategories = []models.ProductCategory{}
+		}
 	}
 
 	return c.JSON(campaigns)

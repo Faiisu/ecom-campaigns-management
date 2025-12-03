@@ -83,11 +83,32 @@ func AddProduct(c *fiber.Ctx) error {
 // @Failure 500 {object} ErrorResponse
 // @Router /products [get]
 func GetProducts(c *fiber.Ctx) error {
+
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	var products []models.Product
-	cursor, err := db.ProductCollection.Find(ctx, bson.M{})
+
+	pipeline := mongo.Pipeline{
+		{{Key: "$lookup", Value: bson.M{
+			"from":         "ProductCategories",
+			"localField":   "product_category_id",
+			"foreignField": "_id",
+			"as":           "category",
+		}}},
+		{{Key: "$unwind", Value: bson.M{
+			"path":                       "$category",
+			"preserveNullAndEmptyArrays": true,
+		}}},
+		{{Key: "$addFields", Value: bson.M{
+			"product_category_name": "$category.name",
+		}}},
+		{{Key: "$project", Value: bson.M{
+			"category": 0,
+		}}},
+	}
+
+	cursor, err := db.ProductCollection.Aggregate(ctx, pipeline)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(ErrorResponse{Error: "Failed to fetch products"})
 	}

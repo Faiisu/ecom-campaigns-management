@@ -721,6 +721,12 @@ const docTemplate = `{
                 "name": {
                     "type": "string"
                 },
+                "product_categories": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.ProductCategory"
+                    }
+                },
                 "start_at": {
                     "type": "string"
                 }
@@ -762,6 +768,9 @@ const docTemplate = `{
                     "type": "number"
                 },
                 "product_category_id": {
+                    "type": "string"
+                },
+                "product_category_name": {
                     "type": "string"
                 }
             }

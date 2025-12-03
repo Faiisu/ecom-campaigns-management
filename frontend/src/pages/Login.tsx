@@ -61,7 +61,7 @@ const Login: React.FC = () => {
                         <span className="text-2xl font-bold text-slate-800 tracking-wide">E-Shop</span>
                     </div>
                     <h1 className="text-5xl font-bold text-slate-900 leading-tight mb-6">
-                        Welcome Back to <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-blue-600">E-Shop</span>
+                        Welcome to <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-blue-600">E-Shop</span>
                     </h1>
                 </div>
 

@@ -1,11 +1,11 @@
 import React from 'react';
 
 interface Product {
-    id: number;
+    id: string;
     name: string;
-    price: string;
-    image: string;
-    category: string;
+    price: number;
+    description: string;
+    product_category_name: string;
 }
 
 const FeaturedProducts: React.FC = () => {
@@ -22,7 +22,7 @@ const FeaturedProducts: React.FC = () => {
                     throw new Error('Failed to fetch products');
                 }
                 const data = await response.json();
-                setProducts(data);
+                setProducts(Array.isArray(data) ? data : []);
             } catch (err) {
                 console.error('Error fetching products:', err);
                 setError('Failed to load products');
@@ -72,18 +72,18 @@ const FeaturedProducts: React.FC = () => {
                         <div key={product.id} className="group relative bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100">
                             <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden bg-gray-200 group-hover:opacity-90 transition-opacity h-64">
                                 <img
-                                    src={product.image}
+                                    src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
                                     alt={product.name}
                                     className="h-full w-full object-cover object-center transform group-hover:scale-110 transition-transform duration-500"
                                 />
                             </div>
                             <div className="p-6">
-                                <p className="text-sm text-indigo-600 font-medium mb-1">{product.category}</p>
+                                <p className="text-sm text-indigo-600 font-medium mb-1">{product.product_category_name || 'Uncategorized'}</p>
                                 <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-1">
                                     {product.name}
                                 </h3>
                                 <div className="flex items-center justify-between mt-4">
-                                    <span className="text-xl font-bold text-gray-900">{product.price}</span>
+                                    <span className="text-xl font-bold text-gray-900">${product.price.toFixed(2)}</span>
                                     <button className="p-2 rounded-full bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white transition-colors">
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />

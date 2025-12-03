@@ -23,6 +23,7 @@ interface Campaign {
     end_at: string;
     is_active: boolean;
     campaign_category_id: string;
+    product_categories?: { id: string; name: string }[];
 }
 
 const CampaignPage: React.FC = () => {
@@ -202,6 +203,7 @@ const CampaignPage: React.FC = () => {
                                         <tr>
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Target Products</th>
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Discount</th>
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                                             <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
@@ -219,6 +221,19 @@ const CampaignPage: React.FC = () => {
                                                         </td>
                                                         <td className="px-6 py-4 text-sm text-gray-500">
                                                             {category ? category.name : <span className="text-gray-400 italic">Unknown</span>}
+                                                        </td>
+                                                        <td className="px-6 py-4 text-sm text-gray-500">
+                                                            {camp.product_categories && camp.product_categories.length > 0 ? (
+                                                                <div className="flex flex-wrap gap-1">
+                                                                    {camp.product_categories.map(pc => (
+                                                                        <span key={pc.id} className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                                                                            {pc.name}
+                                                                        </span>
+                                                                    ))}
+                                                                </div>
+                                                            ) : (
+                                                                <span className="text-gray-400 italic">All Products</span>
+                                                            )}
                                                         </td>
                                                         <td className="px-6 py-4 text-sm text-gray-500">
                                                             {camp.discount_type === 'percentage' ? `${camp.discount_value}%` : `$${camp.discount_value}`}
@@ -251,7 +266,7 @@ const CampaignPage: React.FC = () => {
                                             })
                                         ) : (
                                             <tr>
-                                                <td colSpan={5} className="px-6 py-4 text-center text-sm text-gray-500">No campaigns found.</td>
+                                                <td colSpan={6} className="px-6 py-4 text-center text-sm text-gray-500">No campaigns found.</td>
                                             </tr>
                                         )}
                                     </tbody>
@@ -397,7 +412,7 @@ const CampaignPage: React.FC = () => {
                                                     <p className="text-sm text-gray-500">No product categories found.</p>
                                                 )}
                                             </div>
-                                            <p className="text-xs text-gray-500 mt-1">Select categories to apply this campaign to.</p>
+                                            <p className="text-xs text-gray-500 mt-1">Select categories to apply this campaign to. Leave empty to apply to <strong>ALL</strong> products.</p>
                                         </div>
 
                                         <div className="flex items-center gap-3">
