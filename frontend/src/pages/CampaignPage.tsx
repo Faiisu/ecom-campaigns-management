@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaBullhorn, FaCheck, FaLayerGroup, FaTrash, FaPlay } from 'react-icons/fa';
+import { FaBullhorn, FaCheck, FaPlus, FaTrash, FaPlay } from 'react-icons/fa';
 import CampaignCategoriesModal from '../components/CampaignCategoriesModal';
 
 interface CampaignCategory {
@@ -378,7 +378,7 @@ const CampaignPage: React.FC = () => {
                                                     className="px-3 py-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors"
                                                     title="Manage Categories"
                                                 >
-                                                    <FaLayerGroup />
+                                                    <FaPlus className="text-xl" />
                                                 </button>
                                             </div>
                                         </div>

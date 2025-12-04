@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { FaMinus, FaPlus } from 'react-icons/fa';
 
 interface Product {
     id: string;
@@ -12,6 +13,7 @@ interface Product {
 const FeaturedProducts: React.FC = () => {
     const navigate = useNavigate();
     const [products, setProducts] = React.useState<Product[]>([]);
+    const [quantities, setQuantities] = React.useState<Record<string, number>>({});
     const [isLoading, setIsLoading] = React.useState(true);
     const [error, setError] = React.useState<string | null>(null);
 
@@ -61,6 +63,13 @@ const FeaturedProducts: React.FC = () => {
         );
     }
 
+    const getQuantity = (productId: string) => quantities[productId] || 1;
+
+    const updateQuantity = (productId: string, value: number) => {
+        const newQuantity = Math.max(1, value);
+        setQuantities(prev => ({ ...prev, [productId]: newQuantity }));
+    };
+
     const addToCart = async (productId: string) => {
         const guestId = localStorage.getItem('guestId');
         if (!guestId) {
@@ -77,7 +86,7 @@ const FeaturedProducts: React.FC = () => {
                 },
                 body: JSON.stringify({
                     product_id: productId,
-                    quantity: 1,
+                    quantity: getQuantity(productId),
                     user_id: guestId,
                 }),
             });
@@ -119,14 +128,38 @@ const FeaturedProducts: React.FC = () => {
                                 </h3>
                                 <div className="flex items-center justify-between mt-4">
                                     <span className="text-xl font-bold text-gray-900">${product.price.toFixed(2)}</span>
-                                    <button
-                                        onClick={() => addToCart(product.id)}
-                                        className="p-2 rounded-full bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white transition-colors"
-                                    >
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                                        </svg>
-                                    </button>
+                                    <div className="flex items-center gap-3">
+                                        <div className="flex items-center border border-gray-200 rounded-lg bg-gray-50">
+                                            <button
+                                                onClick={() => updateQuantity(product.id, getQuantity(product.id) - 1)}
+                                                className="p-2 text-gray-600 hover:text-indigo-600 transition-colors"
+                                            >
+                                                <FaMinus size={10} />
+                                            </button>
+                                            <input
+                                                type="number"
+                                                min="1"
+                                                value={getQuantity(product.id)}
+                                                onChange={(e) => updateQuantity(product.id, parseInt(e.target.value) || 1)}
+                                                className="w-10 text-center border-none bg-transparent focus:ring-0 text-sm font-medium text-gray-900 p-0"
+                                            />
+                                            <button
+                                                onClick={() => updateQuantity(product.id, getQuantity(product.id) + 1)}
+                                                className="p-2 text-gray-600 hover:text-indigo-600 transition-colors"
+                                            >
+                                                <FaPlus size={10} />
+                                            </button>
+                                        </div>
+                                        <button
+                                            onClick={() => addToCart(product.id)}
+                                            className="p-2.5 rounded-full bg-indigo-600 text-white hover:bg-indigo-700 transition-colors shadow-sm flex-shrink-0"
+                                            title="Add to Cart"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                                            </svg>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
