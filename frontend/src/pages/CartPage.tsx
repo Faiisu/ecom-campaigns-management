@@ -178,13 +178,13 @@ const CartPage: React.FC = () => {
                                     </div>
                                     <div className="flex-1">
                                         <h3 className="text-lg font-semibold text-gray-900 mb-1">{item.product_name}</h3>
-                                        <p className="text-indigo-600 font-medium">${item.product_price.toFixed(2)}</p>
+                                        <p className="text-indigo-600 font-medium">฿{item.product_price.toFixed(2)}</p>
                                     </div>
                                     <div className="flex items-center gap-6">
                                         <div className="flex flex-col items-end">
                                             <span className="text-sm text-gray-500">Qty: {item.quantity}</span>
                                             <span className="text-lg font-bold text-gray-900 mt-1">
-                                                ${(item.product_price * item.quantity).toFixed(2)}
+                                                ฿{(item.product_price * item.quantity).toFixed(2)}
                                             </span>
                                         </div>
                                         <button
@@ -206,7 +206,7 @@ const CartPage: React.FC = () => {
                                 <div className="space-y-4 mb-6">
                                     <div className="flex justify-between text-gray-600">
                                         <span>Subtotal</span>
-                                        <span>${calculateTotal().toFixed(2)}</span>
+                                        <span>฿{calculateTotal().toFixed(2)}</span>
                                     </div>
 
                                     {/* Selected Campaigns */}
@@ -218,8 +218,8 @@ const CartPage: React.FC = () => {
                                                     <span>{camp.name}</span>
                                                     <span>
                                                         {camp.discount_type === 'percent' && `-${camp.discount_value}%`}
-                                                        {camp.discount_type === 'fixed' && `-$${camp.discount_value}`}
-                                                        {camp.discount_type === 'spendAndSave' && `Spend $${camp.every}, Save $${camp.discount_value}`}
+                                                        {camp.discount_type === 'fixed' && `-฿${camp.discount_value}`}
+                                                        {camp.discount_type === 'spendAndSave' && `Spend ฿${camp.every}, Save ฿${camp.discount_value}`}
                                                         {camp.discount_type === 'points' && `Points`}
                                                     </span>
                                                 </div>
@@ -229,7 +229,7 @@ const CartPage: React.FC = () => {
 
                                     <div className="border-t border-gray-100 pt-4 flex justify-between text-lg font-bold text-gray-900">
                                         <span>Total</span>
-                                        <span>${calculateTotal().toFixed(2)}</span>
+                                        <span>฿{calculateTotal().toFixed(2)}</span>
                                     </div>
                                 </div>
 

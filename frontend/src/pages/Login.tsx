@@ -37,10 +37,6 @@ const Login: React.FC = () => {
             {/* Right Side - Login Form */}
             <div className="w-full lg:w-1/2 p-8 md:p-16 flex flex-col justify-center bg-white relative z-10">
                 <div className="max-w-md mx-auto w-full">
-                    {/* <div className="text-center lg:text-left mb-10">
-                        <h2 className="text-3xl font-bold text-slate-900 mb-2">Sign In</h2>
-                        <p className="text-slate-500">Enter your credentials to access your account</p>
-                    </div> */}
                     <button
                         onClick={async () => {
                             setIsLoading(true);
@@ -57,6 +53,9 @@ const Login: React.FC = () => {
                                     const data = await response.json();
                                     if (data.id) {
                                         localStorage.setItem('guestId', data.id);
+                                        if (data.point !== undefined) {
+                                            localStorage.setItem('guestPoints', data.point.toString());
+                                        }
                                         window.location.href = '/';
                                     } else {
                                         alert('Guest login failed: No ID received');
@@ -83,66 +82,6 @@ const Login: React.FC = () => {
                             </>
                         )}
                     </button>
-
-                    {/* <form onSubmit={handleSubmit} className="space-y-6">
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-slate-700 ml-1">Email Address</label>
-                            <div className="relative group">
-                                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                    <FaEnvelope className="text-slate-400 group-focus-within:text-indigo-600 transition-colors" />
-                                </div>
-                                <input
-                                    type="email"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    className="w-full pl-11 pr-4 py-4 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all duration-300 shadow-sm"
-                                    placeholder="name@company.com"
-                                    required
-                                />
-                            </div>
-                        </div>
-
-                        <div className="space-y-2">
-                            <div className="flex justify-between items-center ml-1">
-                                <label className="text-sm font-medium text-slate-700">Password</label>
-                                <a href="#" className="text-xs text-indigo-600 hover:text-indigo-700 transition-colors font-medium">Forgot password?</a>
-                            </div>
-                            <div className="relative group">
-                                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                    <FaLock className="text-slate-400 group-focus-within:text-indigo-600 transition-colors" />
-                                </div>
-                                <input
-                                    type="password"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    className="w-full pl-11 pr-4 py-4 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all duration-300 shadow-sm"
-                                    placeholder="••••••••"
-                                    required
-                                />
-                            </div>
-                        </div>
-
-                        <button
-                            type="submit"
-                            disabled={isLoading}
-                            className="w-full bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white font-semibold py-4 rounded-xl shadow-lg shadow-indigo-600/20 transform transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 group"
-                        >
-                            {isLoading ? (
-                                <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                            ) : (
-                                <>
-                                    Sign In <FaArrowRight className="group-hover:translate-x-1 transition-transform" />
-                                </>
-                            )}
-                        </button>
-                    </form>
-
-                    <div className="mt-8 text-center">
-                        <p className="text-slate-500">
-                            Don't have an account?{' '}
-                            <Link to="/register" className="text-indigo-600 hover:text-indigo-700 font-medium transition-colors">Create account</Link>
-                        </p>
-                    </div> */}
                 </div>
             </div>
         </div>

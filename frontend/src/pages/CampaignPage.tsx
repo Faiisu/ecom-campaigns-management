@@ -228,9 +228,9 @@ const CampaignPage: React.FC = () => {
                                                         </td>
                                                         <td className="px-6 py-4 text-sm text-gray-500">
                                                             {camp.discount_type === 'percent' && `${camp.discount_value}%`}
-                                                            {camp.discount_type === 'fixed' && `$${camp.discount_value}`}
+                                                            {camp.discount_type === 'fixed' && `฿${camp.discount_value}`}
                                                             {camp.discount_type === 'points' && `Points (Limit: ${camp.limit || 0}%)`}
-                                                            {camp.discount_type === 'spendAndSave' && `Spend $${camp.every}, Save $${camp.discount_value}`}
+                                                            {camp.discount_type === 'spendAndSave' && `Spend ฿${camp.every}, Save ฿${camp.discount_value}`}
                                                         </td>
                                                         <td className="px-6 py-4 whitespace-nowrap">
                                                             <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${camp.is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
@@ -307,7 +307,7 @@ const CampaignPage: React.FC = () => {
                                                 onChange={(e) => setDiscountType(e.target.value)}
                                                 className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none bg-white"
                                             >
-                                                <option value="fixed">Fixed $</option>
+                                                <option value="fixed">Fixed ฿</option>
                                                 <option value="percent">Percent %</option>
                                                 <option value="points">Points</option>
                                                 <option value="spendAndSave">Spend and Save</option>

@@ -120,8 +120,8 @@ const CampaignSelectionModal: React.FC<CampaignSelectionModalProps> = ({ isOpen,
                                                                 key={campaign.id}
                                                                 onClick={() => toggleCampaign(campaign)}
                                                                 className={`relative p-4 rounded-xl border-2 cursor-pointer transition-all ${isSelected
-                                                                        ? 'border-indigo-600 bg-indigo-50'
-                                                                        : 'border-gray-100 hover:border-indigo-200 hover:bg-gray-50'
+                                                                    ? 'border-indigo-600 bg-indigo-50'
+                                                                    : 'border-gray-100 hover:border-indigo-200 hover:bg-gray-50'
                                                                     }`}
                                                             >
                                                                 <div className="flex justify-between items-start">
@@ -133,9 +133,9 @@ const CampaignSelectionModal: React.FC<CampaignSelectionModalProps> = ({ isOpen,
                                                                         <div className="mt-2 flex flex-wrap gap-2">
                                                                             <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
                                                                                 {campaign.discount_type === 'percent' && `${campaign.discount_value}% Off`}
-                                                                                {campaign.discount_type === 'fixed' && `$${campaign.discount_value} Off`}
+                                                                                {campaign.discount_type === 'fixed' && `฿${campaign.discount_value} Off`}
                                                                                 {campaign.discount_type === 'points' && `Points (Limit: ${campaign.limit || 0}%)`}
-                                                                                {campaign.discount_type === 'spendAndSave' && `Spend $${campaign.every}, Save $${campaign.discount_value}`}
+                                                                                {campaign.discount_type === 'spendAndSave' && `Spend ฿${campaign.every}, Save ฿${campaign.discount_value}`}
                                                                             </span>
                                                                             {isConflicting && (
                                                                                 <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800">
@@ -178,8 +178,8 @@ const CampaignSelectionModal: React.FC<CampaignSelectionModalProps> = ({ isOpen,
                                                                 key={campaign.id}
                                                                 onClick={() => toggleCampaign(campaign)}
                                                                 className={`relative p-4 rounded-xl border-2 cursor-pointer transition-all ${isSelected
-                                                                        ? 'border-indigo-600 bg-indigo-50'
-                                                                        : 'border-gray-100 hover:border-indigo-200 hover:bg-gray-50'
+                                                                    ? 'border-indigo-600 bg-indigo-50'
+                                                                    : 'border-gray-100 hover:border-indigo-200 hover:bg-gray-50'
                                                                     }`}
                                                             >
                                                                 <div className="flex justify-between items-start">
@@ -191,9 +191,9 @@ const CampaignSelectionModal: React.FC<CampaignSelectionModalProps> = ({ isOpen,
                                                                         <div className="mt-2 flex flex-wrap gap-2">
                                                                             <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
                                                                                 {campaign.discount_type === 'percent' && `${campaign.discount_value}% Off`}
-                                                                                {campaign.discount_type === 'fixed' && `$${campaign.discount_value} Off`}
+                                                                                {campaign.discount_type === 'fixed' && `฿${campaign.discount_value} Off`}
                                                                                 {campaign.discount_type === 'points' && `Points (Limit: ${campaign.limit || 0}%)`}
-                                                                                {campaign.discount_type === 'spendAndSave' && `Spend $${campaign.every}, Save $${campaign.discount_value}`}
+                                                                                {campaign.discount_type === 'spendAndSave' && `Spend ฿${campaign.every}, Save ฿${campaign.discount_value}`}
                                                                             </span>
                                                                             {isConflicting && (
                                                                                 <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800">

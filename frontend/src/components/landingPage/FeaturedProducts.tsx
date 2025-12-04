@@ -127,7 +127,7 @@ const FeaturedProducts: React.FC = () => {
                                     {product.name}
                                 </h3>
                                 <div className="flex items-center justify-between mt-4">
-                                    <span className="text-xl font-bold text-gray-900">${product.price.toFixed(2)}</span>
+                                    <span className="text-xl font-bold text-gray-900">฿{product.price.toFixed(2)}</span>
                                     <div className="flex items-center gap-3">
                                         <div className="flex items-center border border-gray-200 rounded-lg bg-gray-50">
                                             <button

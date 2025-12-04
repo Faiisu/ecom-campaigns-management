@@ -51,6 +51,11 @@ const Navbar: React.FC = () => {
                                 <button className="flex items-center gap-2 bg-indigo-50 text-indigo-700 px-4 py-2 rounded-full text-sm font-bold border border-indigo-100 hover:bg-indigo-100 transition-colors">
                                     <FaUser className="text-indigo-500" />
                                     <span>GUEST</span>
+                                    {localStorage.getItem('guestPoints') && (
+                                        <span className="flex items-center gap-1 bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full text-xs ml-1">
+                                            P: {localStorage.getItem('guestPoints')}
+                                        </span>
+                                    )}
                                     <FaChevronDown className="text-xs text-indigo-400 group-hover:rotate-180 transition-transform duration-200" />
                                 </button>
 
@@ -60,6 +65,7 @@ const Navbar: React.FC = () => {
                                             <button
                                                 onClick={() => {
                                                     localStorage.removeItem('guestId');
+                                                    localStorage.removeItem('guestPoints');
                                                     window.location.reload();
                                                 }}
                                                 className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 flex items-center gap-2 transition-colors"
