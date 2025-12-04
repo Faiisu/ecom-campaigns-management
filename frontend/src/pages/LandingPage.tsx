@@ -17,9 +17,7 @@ const LandingPage: React.FC = () => {
                 title="Create New Product"
             >
                 <FaPlus className="text-xl" />
-                <span className="max-w-0 overflow-hidden group-hover:max-w-xs group-hover:ml-2 transition-all duration-300 ease-in-out whitespace-nowrap">
-                    Add Product
-                </span>
+                <span className="ml-2">Add Product</span>
             </button>
 
             <CreateProduct isOpen={isCreateProductOpen} onClose={() => setIsCreateProductOpen(false)} />

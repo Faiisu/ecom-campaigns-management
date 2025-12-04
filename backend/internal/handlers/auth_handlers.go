@@ -10,9 +10,9 @@ import (
 	"github.com/google/uuid"
 )
 
-type LoginResponse struct {
-	Message string              `json:"Message"`
-	User    RegisterUserPayload `json:"user"`
+type GuestLoginResponse struct {
+	Message string `json:"Message"`
+	ID      string `json:"id"`
 }
 
 type RegisterUserPayload struct {
@@ -27,16 +27,15 @@ type ErrorResponse struct {
 }
 
 // Register godoc
-// @Summary Register a new user
-// @Description Creates a new user account with hashed password.
+// @Summary Register a guest user
+// @Description Creates a new guest user account.
 // @Tags Auth
 // @Accept json
 // @Produce json
-// @Param register body RegisterRequest true "Register payload"
-// @Success 201 {object} map[string]string
+// @Success 201 {object} GuestLoginResponse
 // @Failure 400 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
-// @Router /register [post]
+// @Router /guestregister [post]
 func GuestRegister(c *fiber.Ctx) error {
 	guestID := uuid.New().String()
 
@@ -57,9 +56,10 @@ func GuestRegister(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(ErrorResponse{Error: "Failed to create user"})
 	}
 
-	resp := make(map[string]string)
-	resp["ID"] = user.ID
-	resp["message"] = "User registered successfully"
+	resp := GuestLoginResponse{
+		Message: "User registered successfully",
+		ID:      guestID,
+	}
 
 	return c.Status(fiber.StatusCreated).JSON(resp)
 }

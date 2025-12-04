@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { FaUser, FaChevronDown, FaSignOutAlt } from 'react-icons/fa';
 
 const Navbar: React.FC = () => {
     const location = useLocation();
@@ -28,21 +29,41 @@ const Navbar: React.FC = () => {
                         >
                             Campaign Manage
                         </Link>
-                        {!isAuthPage && (
+                        {!isAuthPage && !localStorage.getItem('guestId') && (
                             <>
                                 <Link
                                     to="/login"
-                                    className="text-gray-600 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                                    className="bg-indigo-600 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-indigo-700 transition-colors shadow-md hover:shadow-lg"
                                 >
                                     Login
                                 </Link>
-                                <Link
-                                    to="/register"
-                                    className="bg-indigo-600 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-indigo-700 transition-colors shadow-md hover:shadow-lg"
-                                >
-                                    Sign Up
-                                </Link>
                             </>
+                        )}
+                        {localStorage.getItem('guestId') && (
+                            <div className="relative group">
+                                <button className="flex items-center gap-2 bg-indigo-50 text-indigo-700 px-4 py-2 rounded-full text-sm font-bold border border-indigo-100 hover:bg-indigo-100 transition-colors">
+                                    <FaUser className="text-indigo-500" />
+                                    <span>GUEST</span>
+                                    <FaChevronDown className="text-xs text-indigo-400 group-hover:rotate-180 transition-transform duration-200" />
+                                </button>
+
+                                <div className="absolute right-0 top-full w-48 pt-2 hidden group-hover:block z-50">
+                                    <div className="bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden transform transition-all duration-200 origin-top-right">
+                                        <div className="py-1">
+                                            <button
+                                                onClick={() => {
+                                                    localStorage.removeItem('guestId');
+                                                    window.location.reload();
+                                                }}
+                                                className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 flex items-center gap-2 transition-colors"
+                                            >
+                                                <FaSignOutAlt />
+                                                Sign Out
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         )}
                     </div>
                 </div>

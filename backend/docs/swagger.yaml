@@ -5,12 +5,12 @@ definitions:
       error:
         type: string
     type: object
-  handlers.LoginResponse:
+  handlers.GuestLoginResponse:
     properties:
       Message:
         type: string
-      user:
-        $ref: '#/definitions/handlers.RegisterUserPayload'
+      id:
+        type: string
     type: object
   handlers.RegisterCampaign:
     properties:
@@ -56,35 +56,6 @@ definitions:
   handlers.RegisterProductCategory:
     properties:
       name:
-        type: string
-    type: object
-  handlers.RegisterRequest:
-    properties:
-      email:
-        type: string
-      first_name:
-        type: string
-      last_name:
-        type: string
-      password:
-        type: string
-    type: object
-  handlers.RegisterUserPayload:
-    properties:
-      email:
-        type: string
-      first_name:
-        type: string
-      id:
-        type: string
-      last_name:
-        type: string
-    type: object
-  handlers.loginRequest:
-    properties:
-      email:
-        type: string
-      password:
         type: string
     type: object
   models.Campaign:
@@ -155,40 +126,6 @@ info:
   title: Ecom backend api
   version: "1.0"
 paths:
-  /Login:
-    post:
-      consumes:
-      - application/json
-      description: Authenticates a user with email and password.
-      parameters:
-      - description: Login payload
-        in: body
-        name: login
-        required: true
-        schema:
-          $ref: '#/definitions/handlers.loginRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/handlers.LoginResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
-      summary: Login a user
-      tags:
-      - Auth
   /campaign-categories:
     get:
       consumes:
@@ -347,6 +284,29 @@ paths:
       summary: Activate a campaign
       tags:
       - Campaigns
+  /guestregister:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new guest user account.
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/handlers.GuestLoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Register a guest user
+      tags:
+      - Auth
   /product-categories:
     get:
       consumes:
@@ -477,36 +437,4 @@ paths:
       summary: Create a new product
       tags:
       - Products
-  /register:
-    post:
-      consumes:
-      - application/json
-      description: Creates a new user account with hashed password.
-      parameters:
-      - description: Register payload
-        in: body
-        name: register
-        required: true
-        schema:
-          $ref: '#/definitions/handlers.RegisterRequest'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
-      summary: Register a new user
-      tags:
-      - Auth
 swagger: "2.0"

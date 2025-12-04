@@ -70,25 +70,59 @@ const Login: React.FC = () => {
                     <div className="absolute top-1/4 right-10 w-24 h-24 bg-gradient-to-br from-indigo-200 to-transparent rounded-2xl rotate-12 opacity-60 backdrop-blur-sm border border-white/40"></div>
                     <div className="absolute bottom-1/4 left-10 w-32 h-32 bg-gradient-to-tr from-blue-200 to-transparent rounded-full opacity-60 backdrop-blur-sm border border-white/40"></div>
                 </div>
-
-                <div className="relative z-10 flex gap-4 text-sm text-slate-500">
-                    <span>© {new Date().getFullYear()} E-Shop</span>
-                    <span>•</span>
-                    <a href="#" className="hover:text-slate-800 transition-colors">Privacy Policy</a>
-                    <span>•</span>
-                    <a href="#" className="hover:text-slate-800 transition-colors">Terms of Service</a>
-                </div>
             </div>
 
             {/* Right Side - Login Form */}
             <div className="w-full lg:w-1/2 p-8 md:p-16 flex flex-col justify-center bg-white relative z-10">
                 <div className="max-w-md mx-auto w-full">
-                    <div className="text-center lg:text-left mb-10">
+                    {/* <div className="text-center lg:text-left mb-10">
                         <h2 className="text-3xl font-bold text-slate-900 mb-2">Sign In</h2>
                         <p className="text-slate-500">Enter your credentials to access your account</p>
-                    </div>
+                    </div> */}
+                    <button
+                        onClick={async () => {
+                            setIsLoading(true);
+                            try {
+                                const backendUrl = import.meta.env.VITE_BACKEND_URL || '';
+                                const response = await fetch(`${backendUrl}/guestregister`, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                    },
+                                });
 
-                    <form onSubmit={handleSubmit} className="space-y-6">
+                                if (response.ok) {
+                                    const data = await response.json();
+                                    if (data.id) {
+                                        localStorage.setItem('guestId', data.id);
+                                        window.location.href = '/';
+                                    } else {
+                                        alert('Guest login failed: No ID received');
+                                    }
+                                } else {
+                                    const data = await response.json();
+                                    alert(data.Message || 'Guest login failed');
+                                }
+                            } catch (error) {
+                                console.error('Guest login error:', error);
+                                alert('An error occurred during guest login');
+                            } finally {
+                                setIsLoading(false);
+                            }
+                        }}
+                        disabled={isLoading}
+                        className="w-full bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white font-semibold py-4 rounded-xl shadow-lg shadow-indigo-600/20 transform transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 group"
+                    >
+                        {isLoading ? (
+                            <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                        ) : (
+                            <>
+                                Sign In As a Guest <FaArrowRight className="group-hover:translate-x-1 transition-transform" />
+                            </>
+                        )}
+                    </button>
+
+                    {/* <form onSubmit={handleSubmit} className="space-y-6">
                         <div className="space-y-2">
                             <label className="text-sm font-medium text-slate-700 ml-1">Email Address</label>
                             <div className="relative group">
@@ -146,7 +180,7 @@ const Login: React.FC = () => {
                             Don't have an account?{' '}
                             <Link to="/register" className="text-indigo-600 hover:text-indigo-700 font-medium transition-colors">Create account</Link>
                         </p>
-                    </div>
+                    </div> */}
                 </div>
             </div>
         </div>
