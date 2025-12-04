@@ -81,3 +81,58 @@ func AddCartItem(c *fiber.Ctx) error {
 
 	return c.JSON(newItem)
 }
+
+// GetCartItems godoc
+// @Summary Get cart items for a user
+// @Description Retrieve all items in a user's cart with product details
+// @Tags Cart
+// @Accept json
+// @Produce json
+// @Param user_id path string true "User ID"
+// @Success 200 {array} map[string]interface{}
+// @Failure 500 {object} ErrorResponse
+// @Router /cart/{user_id} [get]
+func GetCartItems(c *fiber.Ctx) error {
+	userID := c.Params("user_id")
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	pipeline := mongo.Pipeline{
+		{{Key: "$match", Value: bson.M{"user_id": userID}}},
+		{{Key: "$lookup", Value: bson.M{
+			"from":         "Products",
+			"localField":   "product_id",
+			"foreignField": "_id",
+			"as":           "product",
+		}}},
+		{{Key: "$unwind", Value: bson.M{
+			"path":                       "$product",
+			"preserveNullAndEmptyArrays": true,
+		}}},
+		{{Key: "$project", Value: bson.M{
+			"id":            "$_id",
+			"product_id":    1,
+			"quantity":      1,
+			"product_name":  "$product.name",
+			"product_price": "$product.price",
+		}}},
+	}
+
+	cursor, err := db.CartCollection.Aggregate(ctx, pipeline)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(ErrorResponse{Error: "Failed to fetch cart items"})
+	}
+	defer cursor.Close(ctx)
+
+	var results []bson.M
+	if err = cursor.All(ctx, &results); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(ErrorResponse{Error: "Failed to decode cart items"})
+	}
+
+	// Ensure empty list instead of null
+	if results == nil {
+		results = []bson.M{}
+	}
+
+	return c.JSON(results)
+}

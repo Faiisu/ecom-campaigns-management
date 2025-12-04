@@ -335,6 +335,34 @@ paths:
       summary: Add item to cart
       tags:
       - Cart
+  /cart/{user_id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all items in a user's cart with product details
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              additionalProperties: true
+              type: object
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Get cart items for a user
+      tags:
+      - Cart
   /guestregister:
     post:
       consumes:

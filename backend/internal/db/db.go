@@ -56,7 +56,7 @@ func ConnectMongo(mongoURL, dbName string) error {
 	CategoryCollection = db.Collection("ProductCategories")
 	CampaignCategoryCollection = db.Collection("CampaignCategories")
 	CampaignTargetCategoryCollection = db.Collection("CampaignTargetCategories")
-	CartCollection = db.Collection("cart_items")
+	CartCollection = db.Collection("CartItems")
 
 	return nil
 }
