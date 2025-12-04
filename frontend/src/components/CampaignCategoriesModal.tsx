@@ -1,10 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import { FaLayerGroup, FaTrash, FaTimes, FaCheck } from 'react-icons/fa';
+import { FaLayerGroup, FaTrash, FaTimes, FaCheck, FaBars } from 'react-icons/fa';
+import {
+    DndContext,
+    closestCenter,
+    KeyboardSensor,
+    PointerSensor,
+    useSensor,
+    useSensors,
+    type DragEndEvent,
+} from '@dnd-kit/core';
+import {
+    arrayMove,
+    SortableContext,
+    sortableKeyboardCoordinates,
+    verticalListSortingStrategy,
+    useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 interface CampaignCategory {
     id: string;
     name: string;
     description: string;
+    rank?: number;
 }
 
 interface CampaignCategoriesModalProps {
@@ -22,6 +40,13 @@ const CampaignCategoriesModal: React.FC<CampaignCategoriesModalProps> = ({ isOpe
 
     const backendUrl = import.meta.env.VITE_BACKEND_URL || '';
 
+    const sensors = useSensors(
+        useSensor(PointerSensor),
+        useSensor(KeyboardSensor, {
+            coordinateGetter: sortableKeyboardCoordinates,
+        })
+    );
+
     useEffect(() => {
         if (isOpen) {
             fetchCategories();
@@ -33,7 +58,10 @@ const CampaignCategoriesModal: React.FC<CampaignCategoriesModalProps> = ({ isOpe
             const response = await fetch(`${backendUrl}/campaign-categories`);
             if (response.ok) {
                 const data = await response.json();
-                setCategories(Array.isArray(data) ? data : []);
+                const sortedData = Array.isArray(data)
+                    ? data.sort((a: CampaignCategory, b: CampaignCategory) => (a.rank || 0) - (b.rank || 0))
+                    : [];
+                setCategories(sortedData);
             }
         } catch (error) {
             console.error('Error fetching categories:', error);
@@ -46,10 +74,18 @@ const CampaignCategoriesModal: React.FC<CampaignCategoriesModalProps> = ({ isOpe
         setMessage(null);
 
         try {
+            // Calculate new rank (last + 1)
+            const maxRank = categories.length > 0 ? Math.max(...categories.map(c => c.rank || 0)) : 0;
+            const newRank = maxRank + 1;
+
             const response = await fetch(`${backendUrl}/campaign-categories`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: catName, description: catDescription }),
+                body: JSON.stringify({
+                    name: catName,
+                    description: catDescription,
+                    rank: newRank
+                }),
             });
 
             if (response.ok) {
@@ -90,6 +126,55 @@ const CampaignCategoriesModal: React.FC<CampaignCategoriesModalProps> = ({ isOpe
         }
     };
 
+    const handleDragEnd = async (event: DragEndEvent) => {
+        const { active, over } = event;
+
+        if (active.id !== over?.id) {
+            setCategories((items) => {
+                const oldIndex = items.findIndex((item) => item.id === active.id);
+                const newIndex = items.findIndex((item) => item.id === over?.id);
+
+                const newItems = arrayMove(items, oldIndex, newIndex);
+
+                // Update ranks in backend
+                updateRanks(newItems);
+
+                return newItems;
+            });
+        }
+    };
+
+    const updateRanks = async (items: CampaignCategory[]) => {
+        try {
+            // We only need to update items that have a different rank than their index
+            // But for simplicity and correctness, we might want to update all, or just the affected range.
+            // Let's update all for now to ensure consistency.
+            // Assuming we have to call PATCH for each item.
+
+            const updates = items.map((item, index) => ({
+                id: item.id,
+                rank: index + 1
+            }));
+
+            // Ideally we'd have a bulk update endpoint. 
+            // Since we don't know, we'll iterate.
+            await Promise.all(updates.map(update =>
+                fetch(`${backendUrl}/campaign-categories/${update.id}`, {
+                    method: 'PATCH', // Assuming PATCH for update
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ rank: update.rank })
+                })
+            ));
+
+            // Note: If the backend supports bulk update via POST /campaign-categories with a list, we should use that.
+            // The user prompt showed POST with a single object.
+
+        } catch (error) {
+            console.error('Error updating ranks:', error);
+            setMessage({ type: 'error', text: 'Failed to save new order' });
+        }
+    };
+
     if (!isOpen) return null;
 
     return (
@@ -123,28 +208,33 @@ const CampaignCategoriesModal: React.FC<CampaignCategoriesModalProps> = ({ isOpe
                             <div className="space-y-4">
                                 <h3 className="text-lg font-semibold text-gray-900">Existing Categories</h3>
                                 <div className="bg-gray-50 rounded-xl border border-gray-200 overflow-hidden max-h-96 overflow-y-auto">
-                                    <ul className="divide-y divide-gray-200">
-                                        {categories.length > 0 ? (
-                                            categories.map((cat) => (
-                                                <li key={cat.id} className="p-4 hover:bg-white transition-colors flex justify-between items-start">
-                                                    <div>
-                                                        <p className="font-medium text-gray-900">{cat.name}</p>
-                                                        <p className="text-sm text-gray-500">{cat.description}</p>
-                                                    </div>
-                                                    <button
-                                                        onClick={() => handleDeleteCategory(cat.id)}
-                                                        className="text-red-400 hover:text-red-600 p-1"
-                                                        title="Delete"
-                                                    >
-                                                        <FaTrash />
-                                                    </button>
-                                                </li>
-                                            ))
-                                        ) : (
-                                            <li className="p-4 text-center text-gray-500">No categories found.</li>
-                                        )}
-                                    </ul>
+
+                                    <DndContext
+                                        sensors={sensors}
+                                        collisionDetection={closestCenter}
+                                        onDragEnd={handleDragEnd}
+                                    >
+                                        <SortableContext
+                                            items={categories.map(c => c.id)}
+                                            strategy={verticalListSortingStrategy}
+                                        >
+                                            <ul className="divide-y divide-gray-200">
+                                                {categories.length > 0 ? (
+                                                    categories.map((cat) => (
+                                                        <SortableCategoryItem
+                                                            key={cat.id}
+                                                            category={cat}
+                                                            onDelete={handleDeleteCategory}
+                                                        />
+                                                    ))
+                                                ) : (
+                                                    <li className="p-4 text-center text-gray-500">No categories found.</li>
+                                                )}
+                                            </ul>
+                                        </SortableContext>
+                                    </DndContext>
                                 </div>
+                                <p className="text-xs text-gray-500">Drag and drop to reorder categories.</p>
                             </div>
 
                             {/* Create Form */}
@@ -186,6 +276,59 @@ const CampaignCategoriesModal: React.FC<CampaignCategoriesModalProps> = ({ isOpe
                 </div>
             </div>
         </div>
+    );
+};
+
+interface SortableCategoryItemProps {
+    category: CampaignCategory;
+    onDelete: (id: string) => void;
+}
+
+const SortableCategoryItem: React.FC<SortableCategoryItemProps> = ({ category, onDelete }) => {
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+        isDragging,
+    } = useSortable({ id: category.id });
+
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        zIndex: isDragging ? 10 : 'auto',
+        position: isDragging ? 'relative' as const : undefined,
+        opacity: isDragging ? 0.5 : 1,
+    };
+
+    return (
+        <li
+            ref={setNodeRef}
+            style={style}
+            className={`p-4 hover:bg-white transition-colors flex justify-between items-start bg-white ${isDragging ? 'shadow-lg ring-2 ring-indigo-500 ring-opacity-50' : ''}`}
+        >
+            <div className="flex items-start gap-3 flex-1">
+                <div
+                    {...attributes}
+                    {...listeners}
+                    className="mt-1 text-gray-400 cursor-grab active:cursor-grabbing hover:text-gray-600"
+                >
+                    <FaBars />
+                </div>
+                <div>
+                    <p className="font-medium text-gray-900">{category.name}</p>
+                    <p className="text-sm text-gray-500">{category.description}</p>
+                </div>
+            </div>
+            <button
+                onClick={() => onDelete(category.id)}
+                className="text-red-400 hover:text-red-600 p-1"
+                title="Delete"
+            >
+                <FaTrash />
+            </button>
+        </li>
     );
 };
 

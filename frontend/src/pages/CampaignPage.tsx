@@ -30,10 +30,10 @@ const CampaignPage: React.FC = () => {
     // Campaign State
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
-    const [discountType, setDiscountType] = useState('percentage');
+    const [discountType, setDiscountType] = useState('fixed');
     const [discountValue, setDiscountValue] = useState('');
-    const [startAt, setStartAt] = useState('');
-    const [endAt, setEndAt] = useState('');
+    const [limit, setLimit] = useState('');
+    const [every, setEvery] = useState('');
     const [isActive, setIsActive] = useState(true);
     const [categoryId, setCategoryId] = useState('');
     const [selectedProductCategoryIds, setSelectedProductCategoryIds] = useState<string[]>([]);
@@ -103,9 +103,9 @@ const CampaignPage: React.FC = () => {
                     name,
                     description,
                     discount_type: discountType,
-                    discount_value: parseFloat(discountValue),
-                    start_at: new Date(startAt).toISOString(),
-                    end_at: new Date(endAt).toISOString(),
+                    discount_value: discountValue,
+                    every: every,
+                    limit: limit,
                     is_active: isActive,
                     campaign_category_id: categoryId,
                     list_product_category_id: selectedProductCategoryIds,
@@ -119,8 +119,8 @@ const CampaignPage: React.FC = () => {
                 setName('');
                 setDescription('');
                 setDiscountValue('');
-                setStartAt('');
-                setEndAt('');
+                setLimit('');
+                setEvery('');
                 setCategoryId('');
                 setSelectedProductCategoryIds([]);
             } else {
@@ -236,7 +236,7 @@ const CampaignPage: React.FC = () => {
                                                             )}
                                                         </td>
                                                         <td className="px-6 py-4 text-sm text-gray-500">
-                                                            {camp.discount_type === 'percentage' ? `${camp.discount_value}%` : `$${camp.discount_value}`}
+                                                            {camp.discount_type === 'percent' ? `${camp.discount_value}%` : `$${camp.discount_value}`}
                                                         </td>
                                                         <td className="px-6 py-4 whitespace-nowrap">
                                                             <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${camp.is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
@@ -289,7 +289,7 @@ const CampaignPage: React.FC = () => {
                                                 value={name}
                                                 onChange={(e) => setName(e.target.value)}
                                                 className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
-                                                placeholder="e.g., Black Friday"
+                                                placeholder="e.g., percent Discount"
                                                 required
                                             />
                                         </div>
@@ -305,23 +305,28 @@ const CampaignPage: React.FC = () => {
                                             />
                                         </div>
 
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
-                                                <select
-                                                    value={discountType}
-                                                    onChange={(e) => setDiscountType(e.target.value)}
-                                                    className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none bg-white"
-                                                >
-                                                    <option value="percentage">%</option>
-                                                    <option value="fixed">$</option>
-                                                </select>
-                                            </div>
+
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                                            <select
+                                                value={discountType}
+                                                onChange={(e) => setDiscountType(e.target.value)}
+                                                className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none bg-white"
+                                            >
+                                                <option value="fixed">Fixed $</option>
+                                                <option value="percent">Percent %</option>
+                                                <option value="points">Points</option>
+                                                <option value="spendAndSave">Spend and Save</option>
+                                            </select>
+                                        </div>
+
+                                        {discountType === "percent" || discountType === "fixed" ? (
                                             <div>
                                                 <label className="block text-sm font-medium text-gray-700 mb-1">Value</label>
                                                 <input
                                                     type="number"
-                                                    step="0.01"
+                                                    step="1"
+                                                    min="0"
                                                     value={discountValue}
                                                     onChange={(e) => setDiscountValue(e.target.value)}
                                                     className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
@@ -329,30 +334,46 @@ const CampaignPage: React.FC = () => {
                                                     required
                                                 />
                                             </div>
-                                        </div>
-
-                                        <div className="grid grid-cols-2 gap-4">
+                                        ) : discountType === "points" ? (
                                             <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-1">Start</label>
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">Limit % (0 for no limit)</label>
                                                 <input
-                                                    type="datetime-local"
-                                                    value={startAt}
-                                                    onChange={(e) => setStartAt(e.target.value)}
-                                                    className="w-full px-2 py-2 rounded-lg border border-gray-200 focus:border-indigo-500 outline-none text-sm"
-                                                    required
+                                                    type="number"
+                                                    step="1"
+                                                    value={limit}
+                                                    onChange={(e) => setLimit(e.target.value)}
+                                                    className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
+                                                    placeholder="0"
                                                 />
                                             </div>
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-1">End</label>
-                                                <input
-                                                    type="datetime-local"
-                                                    value={endAt}
-                                                    onChange={(e) => setEndAt(e.target.value)}
-                                                    className="w-full px-2 py-2 rounded-lg border border-gray-200 focus:border-indigo-500 outline-none text-sm"
-                                                    required
-                                                />
+                                        ) : (
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Every</label>
+                                                    <input
+                                                        type="number"
+                                                        step="1"
+                                                        value={every}
+                                                        onChange={(e) => setEvery(e.target.value)}
+                                                        className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
+                                                        placeholder="0"
+                                                        required
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Discount</label>
+                                                    <input
+                                                        type="number"
+                                                        step="1"
+                                                        value={discountValue}
+                                                        onChange={(e) => setDiscountValue(e.target.value)}
+                                                        className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
+                                                        placeholder="0"
+                                                        required
+                                                    />
+                                                </div>
                                             </div>
-                                        </div>
+                                        )}
 
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
@@ -441,14 +462,14 @@ const CampaignPage: React.FC = () => {
                         </div>
                     </div>
                 </div>
-            </div>
+            </div >
 
             <CampaignCategoriesModal
                 isOpen={isCategoryModalOpen}
                 onClose={() => setIsCategoryModalOpen(false)}
                 onUpdate={fetchCategories}
             />
-        </div>
+        </div >
     );
 };
 
