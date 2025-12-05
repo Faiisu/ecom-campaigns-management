@@ -2,7 +2,6 @@
 
 This is the frontend application for the E-commerce System, built with React, TypeScript, and Vite.
 
-
 ## Tech Stack
 
 - **Framework**: [React](https://react.dev/)
@@ -19,7 +18,9 @@ This is the frontend application for the E-commerce System, built with React, Ty
 - npm
 
 ### Installation
+
 From the repo root:
+
 1.  Navigate to the frontend directory:
     ```bash
     cd frontend

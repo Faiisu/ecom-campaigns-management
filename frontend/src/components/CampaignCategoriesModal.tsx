@@ -37,6 +37,7 @@ const CampaignCategoriesModal: React.FC<CampaignCategoriesModalProps> = ({ isOpe
     const [catDescription, setCatDescription] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+    const [hasOrderChanged, setHasOrderChanged] = useState(false);
 
     const backendUrl = import.meta.env.VITE_BACKEND_URL || '';
 
@@ -105,28 +106,7 @@ const CampaignCategoriesModal: React.FC<CampaignCategoriesModalProps> = ({ isOpe
         }
     };
 
-    const handleDeleteCategory = async (id: string) => {
-        if (!window.confirm('Are you sure you want to delete this category?')) return;
-
-        try {
-            const response = await fetch(`${backendUrl}/campaign-categories/${id}`, {
-                method: 'DELETE',
-            });
-
-            if (response.ok) {
-                await fetchCategories();
-                onUpdate(); // Refresh parent
-                setMessage({ type: 'success', text: 'Category deleted!' });
-            } else {
-                setMessage({ type: 'error', text: 'Failed to delete category' });
-            }
-        } catch (error) {
-            console.error('Error deleting category:', error);
-            setMessage({ type: 'error', text: 'Error deleting category' });
-        }
-    };
-
-    const handleDragEnd = async (event: DragEndEvent) => {
+    const handleDragEnd = (event: DragEndEvent) => {
         const { active, over } = event;
 
         if (active.id !== over?.id) {
@@ -135,43 +115,38 @@ const CampaignCategoriesModal: React.FC<CampaignCategoriesModalProps> = ({ isOpe
                 const newIndex = items.findIndex((item) => item.id === over?.id);
 
                 const newItems = arrayMove(items, oldIndex, newIndex);
-
-                // Update ranks in backend
-                updateRanks(newItems);
-
+                setHasOrderChanged(true);
                 return newItems;
             });
         }
     };
 
-    const updateRanks = async (items: CampaignCategory[]) => {
+    const handleSaveOrder = async () => {
         try {
-            // We only need to update items that have a different rank than their index
-            // But for simplicity and correctness, we might want to update all, or just the affected range.
-            // Let's update all for now to ensure consistency.
-            // Assuming we have to call PATCH for each item.
-
-            const updates = items.map((item, index) => ({
-                id: item.id,
+            const updates = categories.map((item, index) => ({
+                category_id: item.id,
                 rank: index + 1
             }));
 
-            // Ideally we'd have a bulk update endpoint. 
-            // Since we don't know, we'll iterate.
-            await Promise.all(updates.map(update =>
-                fetch(`${backendUrl}/campaign-categories/${update.id}`, {
-                    method: 'PATCH', // Assuming PATCH for update
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ rank: update.rank })
-                })
-            ));
+            const response = await fetch(`${backendUrl}/campaign-categories/realign`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updates)
+            });
 
-            // Note: If the backend supports bulk update via POST /campaign-categories with a list, we should use that.
-            // The user prompt showed POST with a single object.
+            if (!response.ok) {
+                throw new Error('Failed to update ranks');
+            }
+
+            setMessage({ type: 'success', text: 'Order saved successfully' });
+            setHasOrderChanged(false);
+            onUpdate(); // Refresh parent if needed
 
         } catch (error) {
             console.error('Error updating ranks:', error);
             setMessage({ type: 'error', text: 'Failed to save new order' });
+            fetchCategories(); // Re-fetch to reset to server state
+            setHasOrderChanged(false);
         }
     };
 
@@ -224,7 +199,6 @@ const CampaignCategoriesModal: React.FC<CampaignCategoriesModalProps> = ({ isOpe
                                                         <SortableCategoryItem
                                                             key={cat.id}
                                                             category={cat}
-                                                            onDelete={handleDeleteCategory}
                                                         />
                                                     ))
                                                 ) : (
@@ -234,7 +208,18 @@ const CampaignCategoriesModal: React.FC<CampaignCategoriesModalProps> = ({ isOpe
                                         </SortableContext>
                                     </DndContext>
                                 </div>
-                                <p className="text-xs text-gray-500">Drag and drop to reorder categories.</p>
+
+                                <div className="flex justify-between items-center mt-2">
+                                    <p className="text-xs text-gray-500">Drag and drop to reorder categories.</p>
+                                    {hasOrderChanged && (
+                                        <button
+                                            onClick={handleSaveOrder}
+                                            className="px-3 py-1 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700 transition-colors"
+                                        >
+                                            Save Order
+                                        </button>
+                                    )}
+                                </div>
                             </div>
 
                             {/* Create Form */}
@@ -281,10 +266,9 @@ const CampaignCategoriesModal: React.FC<CampaignCategoriesModalProps> = ({ isOpe
 
 interface SortableCategoryItemProps {
     category: CampaignCategory;
-    onDelete: (id: string) => void;
 }
 
-const SortableCategoryItem: React.FC<SortableCategoryItemProps> = ({ category, onDelete }) => {
+const SortableCategoryItem: React.FC<SortableCategoryItemProps> = ({ category }) => {
     const {
         attributes,
         listeners,
@@ -321,13 +305,6 @@ const SortableCategoryItem: React.FC<SortableCategoryItemProps> = ({ category, o
                     <p className="text-sm text-gray-500">{category.description}</p>
                 </div>
             </div>
-            <button
-                onClick={() => onDelete(category.id)}
-                className="text-red-400 hover:text-red-600 p-1"
-                title="Delete"
-            >
-                <FaTrash />
-            </button>
         </li>
     );
 };
