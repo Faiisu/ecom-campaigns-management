@@ -1,10 +1,6 @@
 # Ecom Backend
 
-This is the backend service for the Ecom System, built with Go (Fiber) and MongoDB. It provides API endpoints for user authentication, product management, and other e-commerce functionalities.
-
-## Getting Started
-
-Follow these instructions to get a copy of the project up and running on your local machine for development and testing purposes.
+This is the backend service for the Ecom System, built with Go (Fiber) and MongoDB. It provides API endpoints for user authentication (only guest login), product management and campaigns management system.
 
 ### Prerequisites
 
@@ -19,7 +15,6 @@ Ensure you have the following installed on your system:
 
    ```bash
    git clone https://github.com/faiisu/ecom-backend.git
-   cd ecom-backend
    ```
 
 2. Install dependencies:
@@ -33,14 +28,14 @@ Create a `.env` file in the root directory of the project. You can copy the exam
 
 ```env
 PORT=8080
-MONGO_URL=mongodb://localhost:27017
+MONGO_URL=mongodb://localhost:8080
 MONGO_DB_NAME=ecom_db
 ```
 
 | Variable        | Description                                      | Default                     |
 | :-------------- | :----------------------------------------------- | :-------------------------- |
 | `PORT`          | The port the server will listen on.              | `8080`                      |
-| `MONGO_URL`     | The connection string for your MongoDB instance. | `mongodb://localhost:27017` |
+| `MONGO_URL`     | The connection string for your MongoDB instance. | `mongodb://localhost:8080` |
 | `MONGO_DB_NAME` | The name of the database to use.                 | `ecom_db`                   |
 
 ### Running the Application
@@ -63,6 +58,4 @@ The server will start on `http://localhost:8080` (or the port specified in your 
 
 Swagger API documentation is available at:
 
-[http://localhost:8080/swagger/index.html](http://localhost:8080/swagger/index.html)
-
-This interactive documentation allows you to explore and test the available API endpoints.
+[http://localhost:8080/swagger/index.html](http://localhost:8080/swagger/index.html).
