@@ -129,7 +129,7 @@ const CartPage: React.FC = () => {
 
     useEffect(() => {
         setSubtotal(getSubtotal());
-        setFinalTotal(subtotal);
+        setFinalTotal(getSubtotal());
     }, [cartItems]);
 
     const calculateDiscount = (currentCampaigns: Campaign[], currentCartItems: CartItem[]) => {

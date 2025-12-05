@@ -330,7 +330,7 @@ const CampaignPage: React.FC = () => {
                                             </div>
                                         ) : discountType === "points" ? (
                                             <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-1">Limit % (0 for no limit)</label>
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">Limit %</label>
                                                 <input
                                                     type="number"
                                                     step="1"
