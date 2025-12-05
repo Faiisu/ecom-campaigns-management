@@ -1,75 +1,91 @@
-# React + TypeScript + Vite
+# E-commerce System Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is the frontend application for the E-commerce System, built with React, TypeScript, and Vite. It provides a modern, responsive user interface for users to browse products, manage their cart, and complete purchases.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Product Listing**: Browse and search for products with various categories.
+- **Shopping Cart**: Add items to cart, view summary, and apply discounts.
+- **Checkout**: Secure checkout process with guest and user login support.
+- **User Authentication**: Sign up, login, and guest login functionality.
+- **Campaigns & Discounts**: Apply promotional campaigns to cart items.
+- **Responsive Design**: Optimized for both desktop and mobile devices.
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+- **Framework**: [React](https://react.dev/)
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
+- **Build Tool**: [Vite](https://vitejs.dev/)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+- **Routing**: [React Router](https://reactrouter.com/)
+- **Icons**: [React Icons](https://react-icons.github.io/react-icons/)
+- **DnD**: [dnd-kit](https://dndkit.com/) (for drag and drop interactions)
 
-Note: This will impact Vite dev & build performances.
+## Getting Started
 
-## Expanding the ESLint configuration
+### Prerequisites
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- Node.js (v18 or higher recommended)
+- npm or yarn
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### Installation
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+1.  Clone the repository:
+    ```bash
+    git clone <repository-url>
+    ```
+2.  Navigate to the frontend directory:
+    ```bash
+    cd frontend
+    ```
+3.  Install dependencies:
+    ```bash
+    npm install
+    ```
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Running the Development Server
+
+To start the development server with Hot Module Replacement (HMR):
+
+```bash
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+The application will be available at `http://localhost:5173` (or another port if 5173 is busy).
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Building for Production
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+To build the application for production:
+
+```bash
+npm run build
 ```
+
+This will generate the static files in the `dist` directory.
+
+### Linting
+
+To run the linter:
+
+```bash
+npm run lint
+```
+
+## Project Structure
+
+The `src` directory contains the source code:
+
+- `components/`: Reusable UI components (e.g., Navbar, ProductCard).
+- `pages/`: Page components corresponding to routes (e.g., LandingPage, CartPage).
+- `context/`: React Context definitions (if any).
+- `hooks/`: Custom React hooks.
+- `types/`: TypeScript type definitions.
+- `utils/`: Utility functions.
+- `App.tsx`: Main application component and routing setup.
+- `main.tsx`: Entry point of the application.
+
+## Configuration
+
+- `vite.config.ts`: Vite configuration.
+- `tailwind.config.js`: Tailwind CSS configuration.
+- `tsconfig.json`: TypeScript configuration.
