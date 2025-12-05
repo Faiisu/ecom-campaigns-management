@@ -2,6 +2,8 @@
 
 This repository contains the Go/Fiber backend, React/Vite frontend, and deployment assets for running the stack with Docker Compose.
 
+Project Owners : Sukum Decha
+
 ## Prerequisites
 - Docker Desktop (or Docker Engine) with the Compose plugin
 - Reachable MongoDB instance and connection string

@@ -1,4 +1,4 @@
-# E-commerce System Frontend
+# Campaigns management System Backend Frontend
 
 This is the frontend application for the E-commerce System, built with React, TypeScript, and Vite.
 

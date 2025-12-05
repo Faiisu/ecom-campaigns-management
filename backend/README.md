@@ -1,4 +1,6 @@
-# Ecom Backend
+# Campaigns management System Backend
+
+Project Owners : Sukum Decha
 
 This is the backend service for the Ecom System, built with Go (Fiber) and MongoDB. It provides API endpoints for user authentication (only guest login), product management and campaigns management system.
 

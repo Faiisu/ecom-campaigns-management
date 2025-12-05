@@ -1,5 +1,7 @@
 # E-commerce Campaigns management System
 
+Project Owners : Sukum Decha
+
 This is the function design for the E-commerce campaigns system, the module can create custom campaings through frontend ui and apply to transaction system correctly
 
 **Live demo:** http://167.71.218.173:3001
