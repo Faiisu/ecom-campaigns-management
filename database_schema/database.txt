@@ -1,0 +1,80 @@
+Table products {
+  id string [primary key]
+  name varchar [not null]
+  description text
+  product_category_id string
+  product_category_name string
+  price float
+  is_active boolean [default: true]
+  created_at timestamp [default: `now()`]
+}
+
+Table ProductCategories {
+  id string [primary key]
+  name varchar
+}
+
+Table Users {
+  id string [primary key]
+  email varchar [unique]
+  password_hash varchar
+  point int
+  first_name varchar
+  last_name varchar
+  is_guest boolean
+  created_at timestamp
+  last_login timestamp
+}
+
+Table cart_items {
+  id string [primary key]
+  user_id string
+  product_id string
+  quantity integer  
+}
+
+Table Campaigns {
+  id string [primary key]
+  name text
+  description text
+  discount_type varchar [note: ' "percent", "fixed", "point", "spendAndSave" ']
+  discount_value decimal(10,2)
+  limit   decimal(10,2)
+  every   decimal(10,2)  
+  campaign_category_id string
+  is_active boolean  
+}
+
+Table CampaignsCategories {
+  id string [primary key]
+  name text
+  description text
+  rank int
+}
+
+Table campaign_target_categories {
+  campaign_id string
+  product_category_id string
+}
+
+Table cart_Campaigns {
+  user_id string
+  campaign_id string
+}
+
+// --- RELATIONSHIPS ---
+
+Ref: products.product_category_id > ProductCategories.id
+
+Ref: campaign_target_categories.campaign_id > Campaigns.id
+Ref: campaign_target_categories.product_category_id > ProductCategories.id
+
+Ref: cart_Campaigns.campaign_id > Campaigns.id
+
+Ref: cart_items.product_id > products.id
+
+Ref: cart_items.user_id > Users.id
+
+Ref: cart_Campaigns.user_id > Users.id
+
+Ref: Campaigns.campaign_category_id > CampaignsCategories.id
