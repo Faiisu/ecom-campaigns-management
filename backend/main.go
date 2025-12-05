@@ -15,7 +15,7 @@ import (
 // @title Ecom backend api
 // @version 1.0
 // @description API endpoints for registering users.
-// @host localhost:8080
+// @host localhost:8081
 // @BasePath /
 func main() {
 	cfg := config.LoadConfig()
@@ -25,7 +25,7 @@ func main() {
 	app := fiber.New()
 
 	app.Use(cors.New(cors.Config{
-		AllowOrigins: "http://192.168.1.5:5173, http://localhost:5173",
+		AllowOrigins: "http://192.168.1.5:8081,http://192.168.1.5:3001,http://167.71.218.173:3001, http://167.71.218.173:8081",
 		AllowMethods: "GET,POST,HEAD,PUT,DELETE,PATCH,OPTIONS",
 		AllowHeaders: "Origin, Content-Type, Accept, Authorization",
 	}))

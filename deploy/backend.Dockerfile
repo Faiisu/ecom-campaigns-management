@@ -25,11 +25,9 @@ WORKDIR /app
 
 COPY --from=builder /app/server /app/server
 
-ENV MONGO_URL= \
-    MONGO_DB_NAME=event_hub
-
-EXPOSE 8080
+EXPOSE 8081
 
 USER nonroot:nonroot
 
 CMD ["/app/server"]
+
