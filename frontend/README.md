@@ -1,13 +1,7 @@
 # E-commerce System Frontend
 
-This is the frontend application for the E-commerce System, built with React, TypeScript, and Vite. It provides a modern, responsive user interface for users to browse products, manage their cart, and complete purchases.
+This is the frontend application for the E-commerce System, built with React, TypeScript, and Vite.
 
-## Features
-- **Authentication**: Login as a guest only
-- **Campaigns Management**: create custom campaigns system
-- **Product Listing**: Browse and search for products with various categories.
-- **Shopping Cart**: Add items to cart, view summary, and apply discounts.
-- **Campaigns & Discounts**: Apply promotional campaigns to cart items.
 
 ## Tech Stack
 
@@ -25,12 +19,12 @@ This is the frontend application for the E-commerce System, built with React, Ty
 - npm
 
 ### Installation
-
+From the repo root:
 1.  Navigate to the frontend directory:
     ```bash
     cd frontend
     ```
-3.  Install dependencies:
+2.  Install dependencies:
     ```bash
     npm install
     ```

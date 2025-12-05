@@ -4,19 +4,14 @@ This is the backend service for the Ecom System, built with Go (Fiber) and Mongo
 
 ### Prerequisites
 
-Ensure you have the following installed on your system:
-
 - [Go](https://go.dev/dl/) (version 1.24 or higher)
-- [MongoDB](https://www.mongodb.com/try/download/community)
+- [MongoDB](https://www.mongodb.com/)
 
-### Installation
-
-1. Clone the repository:
-
-   ```bash
-   git clone https://github.com/faiisu/ecom-backend.git
-   ```
-
+From the repo root:
+1.  Navigate to the backend directory:
+    ```bash
+    cd backend
+    ```
 2. Install dependencies:
    ```bash
    go mod download
@@ -28,15 +23,9 @@ Create a `.env` file in the root directory of the project. You can copy the exam
 
 ```env
 PORT=8080
-MONGO_URL=mongodb://localhost:8080
+MONGO_URL= {mongodb url}
 MONGO_DB_NAME=ecom_db
 ```
-
-| Variable        | Description                                      | Default                     |
-| :-------------- | :----------------------------------------------- | :-------------------------- |
-| `PORT`          | The port the server will listen on.              | `8080`                      |
-| `MONGO_URL`     | The connection string for your MongoDB instance. | `mongodb://localhost:8080` |
-| `MONGO_DB_NAME` | The name of the database to use.                 | `ecom_db`                   |
 
 ### Running the Application
 
@@ -59,3 +48,6 @@ The server will start on `http://localhost:8080` (or the port specified in your 
 Swagger API documentation is available at:
 
 [http://localhost:8080/swagger/index.html](http://localhost:8080/swagger/index.html).
+
+## Deploy
+- Container builds and compose config: see `deploy/README.md`

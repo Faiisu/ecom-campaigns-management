@@ -12,7 +12,7 @@ services:
     environment:
       MONGO_URL: ${MONGO_URL}
       MONGO_DB_NAME: ${MONGO_DB_NAME:-ecom-system}
-      PORT: 8080
+      PORT: ${BACKEND_PORT:-8080}
     ports:
       - "8080:8080"
     restart: unless-stopped
@@ -25,7 +25,7 @@ services:
       args:
         VITE_BACKEND_URL: ${VITE_BACKEND_URL}
     ports:
-      - "80:80"
+      - "#{FRONTEND_PORT:-3001}:80"
     restart: unless-stopped
     container_name: frontend
     depends_on:
