@@ -22,7 +22,7 @@ MONGO_DB_NAME=ecom-system
 BACKEND_PORT=8081
 
 # Frontend build-time API base URL (what the browser will call)
-VITE_BACKEND_URL=http://167.71.218.173:8081
+VITE_BACKEND_URL=http://localhost:8081
 FRONTEND_PORT=3001
 ```
 
